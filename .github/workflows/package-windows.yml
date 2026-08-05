@@ -11,25 +11,35 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Download project source
+      - name: Download build files
         uses: actions/checkout@v4
+
+      - name: Unpack MangaBookWizard source
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force source | Out-Null
+          Expand-Archive -Path MangaBookWizard.v01-source.zip -DestinationPath source -Force
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
+          cache-dependency-path: source/requirements.txt
 
       - name: Install build requirements
+        working-directory: source
         run: |
           python -m pip install --upgrade pip
           python -m pip install pyinstaller certifi
           python -m pip install -r requirements.txt
 
       - name: Run app tests
+        working-directory: source
         run: python -m unittest discover -v
 
       - name: Build Windows EXE
+        working-directory: source
         run: >
           python -m PyInstaller
           --clean
@@ -44,7 +54,7 @@ jobs:
       - name: Confirm EXE exists
         shell: pwsh
         run: |
-          if (!(Test-Path "dist/MangaBookWizard.v01-Windows-x64.exe")) {
+          if (!(Test-Path "source/dist/MangaBookWizard.v01-Windows-x64.exe")) {
             throw "The Windows EXE was not created."
           }
 
@@ -52,5 +62,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MangaBookWizard.v01-Windows-x64
-          path: dist/MangaBookWizard.v01-Windows-x64.exe
+          path: source/dist/MangaBookWizard.v01-Windows-x64.exe
           if-no-files-found: error
