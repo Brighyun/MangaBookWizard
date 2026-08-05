@@ -9,6 +9,8 @@ permissions:
 jobs:
   build-windows-exe:
     runs-on: windows-latest
+    env:
+      PYTHONUTF8: "1"
 
     steps:
       - name: Download build files
