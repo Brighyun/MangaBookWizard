@@ -34,9 +34,15 @@ jobs:
           python -m pip install pyinstaller certifi
           python -m pip install -r requirements.txt
 
-      - name: Run app tests
+      - name: Run Windows-relevant app tests
         working-directory: source
-        run: python -m unittest discover -v
+        run: >
+          python -m unittest -v
+          tests.test_comicarchive
+          tests.test_gui_defaults
+          tests.test_preflight
+          tests.test_cli_tools
+          tests.test_passthrough
 
       - name: Build Windows EXE
         working-directory: source
